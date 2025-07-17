@@ -19,7 +19,7 @@ app = FastAPI()
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Allow all origins for development
+    allow_origins=["http://localhost:5173", "https://master-hub-task.vercel.app"],  # Allow all origins for development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
