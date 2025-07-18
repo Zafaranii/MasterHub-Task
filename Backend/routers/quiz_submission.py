@@ -10,7 +10,7 @@ from models.Quiz import Quiz
 
 router = APIRouter(prefix="/submissions", tags=["submissions"])
 
-@router.post("/create-submission", response_model=QuizSessionResponse)
+@router.post("/create-submission")
 def create_submission(quiz_session: QuizSessionCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.is_teacher:
         raise HTTPException(status_code=403, detail="Only students can make submissions")
