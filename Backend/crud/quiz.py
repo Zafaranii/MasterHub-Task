@@ -9,7 +9,8 @@ def create_quiz(teacher_id: int, quiz: QuizCreate, db: Session):
     db_quiz = Quiz(
         title=quiz.title,
         duration=quiz.duration,
-        user_id=teacher_id
+        user_id=teacher_id,
+        grade = quiz.grade
     )
     db.add(db_quiz)
     db.commit()
