@@ -15,7 +15,7 @@ def create_submission(quiz_session: QuizSessionCreate, db: Session = Depends(get
     if current_user.is_teacher:
         raise HTTPException(status_code=403, detail="Only students can make submissions")
     
-    quiz_session_ = quiz_session_create(quiz_session, db, current_user.id)
+    quiz_session = quiz_session_create(quiz_session, db, current_user.id)
     return quiz_session
 
 @router.get("/get-submissions/{quiz_id}", response_model=List[QuizSessionResponse])
@@ -36,4 +36,4 @@ def get_submissions(quiz_id: int, db: Session = Depends(get_db), current_user: U
 
 @router.get("/get-submission/{quiz_id}", response_model=QuizSessionScore)
 def get_submission(quiz_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return get_score(current_user.id, db)
+    return get_score(current_user.id, db, quiz_id)

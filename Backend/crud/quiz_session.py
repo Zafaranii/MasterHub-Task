@@ -46,7 +46,7 @@ def get_quiz_sessions_by_teacher(teacher_id: int, db: Session, quiz_id: int):
     ).all()
     return sessions
 
-def get_score(student_id: int, db: Session):
+def get_score(student_id: int, db: Session, quiz_id : int):
     session = db.query(QuizSession).filter(QuizSession.student_id == student_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="No submission found for this student")
