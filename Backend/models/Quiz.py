@@ -18,4 +18,4 @@ class Quiz(Base):
     start_time = Column(DateTime(timezone=True), nullable=True)
     end_time = Column(DateTime(timezone=True), nullable=True)
 
-    grade = Column(Integer, ForeignKey("users.grade"))
+    grade = Column(Integer, nullable = False)
