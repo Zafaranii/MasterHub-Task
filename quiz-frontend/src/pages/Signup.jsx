@@ -23,6 +23,7 @@ function Signup() {
     e.preventDefault();
     setError(null);
     try {
+      // Create the base signup data
       const signupData = { 
         username, 
         password, 
@@ -31,14 +32,18 @@ function Signup() {
         is_teacher: isTeacher 
       };
       
-      // Only add grade if user is not a teacher
-      if (!isTeacher) {
+      // Only add grade if user is NOT a teacher
+      if (!isTeacher && grade) {
         signupData.grade = grade;
       }
       
+      // Debug log to see what's being sent
+      console.log('Signup data being sent:', signupData);
+      
       await signup(signupData);
       navigate('/dashboard');
-    } catch {
+    } catch (err) {
+      console.error('Signup error:', err);
       setError('Signup failed');
     }
   };

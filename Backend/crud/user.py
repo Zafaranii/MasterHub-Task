@@ -13,7 +13,8 @@ def signup_User(user: UserCreate, db: Session):
         full_name=user.full_name,
         username=user.username,
         is_teacher=user.is_teacher, 
-        hashed_password=hash_password(user.password)
+        hashed_password=hash_password(user.password),
+        grade = user.grade
     )
     db.add(db_user)
     db.commit()
