@@ -42,7 +42,6 @@ function QuizDetails() {
 
   useEffect(() => {
     if (quiz) {
-      // Check availability window
       const now = new Date();
       if (quiz.start_time) {
         const startTime = new Date(quiz.start_time);
@@ -59,7 +58,6 @@ function QuizDetails() {
         }
       }
 
-      // Set up timer for quiz duration
       const duration = quiz.duration ? quiz.duration * 60 : 600;
       setTimeLeft(duration);
       timerRef.current = setInterval(() => {
@@ -93,9 +91,23 @@ function QuizDetails() {
         quiz_id: Number(id),
         answers: answersArray
       });
-      setScore(res.data.score);
+      
+      console.log('Submission response:', res);
+      console.log('Response data:', res.data);
+      
+      let responseScore = null;
+      if (res.data && res.data.score !== undefined) {
+        responseScore = res.data.score;
+      } else if (res.score !== undefined) {
+        responseScore = res.score;
+      }
+      
+      console.log('Extracted score:', responseScore);
+      
+      setScore(responseScore);
       setSubmitted(true);
-    } catch {
+    } catch (err) {
+      console.error('Submission error:', err);
       setError('Failed to submit answers');
     } finally {
       setSubmitting(false);
@@ -181,9 +193,28 @@ function QuizDetails() {
 
   if (submitted) return (
     <div style={{ textAlign: 'center', margin: '2rem' }}>
-      Quiz submitted! Thank you.
-      {score !== null && <div style={{ marginTop: 16 }}>Your score: {score}</div>}
-      <div style={{ marginTop: 16 }}><a href={`/quizzes/${id}/results`}>View Results</a></div>
+      <h2>Quiz Submitted Successfully!</h2>
+      <p>Thank you for completing the quiz.</p>
+      {score !== null && score !== undefined ? (
+        <div style={{ marginTop: 16, fontSize: '1.2em', fontWeight: 'bold' }}>
+          Your score: {score}
+        </div>
+      ) : (
+        <div style={{ marginTop: 16, color: '#666' }}>
+          Your score will be available soon.
+        </div>
+      )}
+      <div style={{ marginTop: 16 }}>
+        <a href={`/quizzes/${id}/results`} style={{ 
+          padding: '8px 16px', 
+          backgroundColor: '#007bff', 
+          color: 'white', 
+          textDecoration: 'none', 
+          borderRadius: '4px' 
+        }}>
+          View Results
+        </a>
+      </div>
     </div>
   );
   if (expired) return <div style={{ textAlign: 'center', margin: '2rem' }}>Time is up! Quiz closed.</div>;
@@ -192,7 +223,6 @@ function QuizDetails() {
     <div style={{ maxWidth: 600, margin: '2rem auto' }}>
       <h2>{quiz.title}</h2>
       
-      {/* Availability Window Information */}
       {(quiz.start_time || quiz.end_time) && (
         <div style={{ 
           marginBottom: 16, 
