@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { fetchQuizById } from '../services/quizService';
 import Loader from '../components/Loader';
 import ErrorMessage from '../components/ErrorMessage';
@@ -7,7 +7,6 @@ import api from '../services/api';
 
 function QuizDetails() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,7 +16,6 @@ function QuizDetails() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [expired, setExpired] = useState(false);
   const [score, setScore] = useState(null);
-  const [submissionData, setSubmissionData] = useState(null);
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
   const [availabilityStatus, setAvailabilityStatus] = useState(null);
   const timerRef = useRef();
@@ -95,7 +93,6 @@ function QuizDetails() {
       });
       
       const responseData = res.data;
-      setSubmissionData(responseData);
       setScore(responseData.score);
       setSubmitted(true);
     } catch (err) {
@@ -103,17 +100,6 @@ function QuizDetails() {
       setError('Failed to submit answers');
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleViewResults = () => {
-    if (submissionData) {
-      localStorage.setItem(`quiz_results_${id}`, JSON.stringify({
-        score: submissionData.score,
-        answers: answers,
-        questions: quiz.questions
-      }));
-      navigate(`/quizzes/${id}/results`);
     }
   };
 
@@ -209,7 +195,7 @@ function QuizDetails() {
       )}
       <div style={{ marginTop: 16 }}>
         <button 
-          onClick={handleViewResults}
+          onClick={() => window.location.href = '/dashboard'}
           style={{ 
             padding: '8px 16px', 
             backgroundColor: '#007bff', 
@@ -219,7 +205,7 @@ function QuizDetails() {
             cursor: 'pointer'
           }}
         >
-          View Results
+          Go to Dashboard
         </button>
       </div>
     </div>

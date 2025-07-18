@@ -5,7 +5,6 @@ import QuizDetails from '../pages/QuizDetails';
 import Login from '../pages/Login';
 import Signup from '../pages/Signup';
 import CreateQuiz from '../pages/CreateQuiz';
-import QuizResults from '../pages/QuizResults';
 import QuizSubmissions from '../pages/QuizSubmissions';
 import QuizStudentDetails from '../pages/QuizStudentDetails';
 import { useAuth } from '../components/AuthProvider';
@@ -19,7 +18,6 @@ function ProtectedRoute({ children }) {
 
 function AppRoutes({ onlyAuth }) {
   if (!onlyAuth) {
-    // Only show login/signup routes
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -35,7 +33,6 @@ function AppRoutes({ onlyAuth }) {
       <Route path="/signup" element={<Signup />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/quizzes/:id" element={<QuizDetails />} />
-      <Route path="/quizzes/:id/results" element={<QuizResults />} />
       <Route path="/quizzes/:id/submissions" element={<ProtectedRoute><QuizSubmissions /></ProtectedRoute>} />
       <Route path="/quizzes/create" element={<ProtectedRoute><CreateQuiz /></ProtectedRoute>} />
     </Routes>
