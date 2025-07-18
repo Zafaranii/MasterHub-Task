@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createQuizTeacher } from '../services/quizService';
 import { useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
+import api from '../services/api';
 
 function CreateQuiz() {
   const [title, setTitle] = useState('');
@@ -19,6 +20,7 @@ function CreateQuiz() {
   const [points, setPoints] = useState(1);
   const [error, setError] = useState(null);
   const [addQuestionError, setAddQuestionError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const resetQuestionFields = () => {
@@ -66,7 +68,6 @@ function CreateQuiz() {
       type: questionType,
       points: points,
       correct_answer: correctAnswer,
-      // quiz_id will be added by backend or after quiz creation
     };
     if (questionType === 'MCQ') {
       questionObj.options = options.filter(opt => opt.trim() !== '');
@@ -93,14 +94,36 @@ function CreateQuiz() {
     setOptions(options.filter((_, i) => i !== idx));
   };
 
+  const createQuestion = async (questionData, quizId) => {
+    const questionPayload = {
+      ...questionData,
+      quiz_id: quizId
+    };
+    await api.post('/questions/create-question', questionPayload);
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
     setError(null);
+    setSubmitting(true);
+    
     try {
-      await createQuizTeacher({ title, start, end, duration, grade, questions });
+      // First, create the quiz
+      const quizData = { title, duration, grade };
+      const quizResponse = await createQuizTeacher(quizData);
+      const quizId = quizResponse.id;
+      
+      // Then, create each question
+      for (const question of questions) {
+        await createQuestion(question, quizId);
+      }
+      
       navigate('/dashboard');
-    } catch {
+    } catch (err) {
+      console.error('Create quiz error:', err);
       setError('Failed to create quiz');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -266,8 +289,8 @@ function CreateQuiz() {
             </li>
           ))}
         </ul>
-        <button type="submit" style={{ width: '100%' }}>
-          Create Quiz
+        <button type="submit" disabled={submitting} style={{ width: '100%' }}>
+          {submitting ? 'Creating Quiz...' : 'Create Quiz'}
         </button>
         {error && <ErrorMessage message={error} />}
       </form>
