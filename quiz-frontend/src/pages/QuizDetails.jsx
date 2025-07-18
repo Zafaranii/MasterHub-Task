@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchQuizById } from '../services/quizService';
 import Loader from '../components/Loader';
 import ErrorMessage from '../components/ErrorMessage';
@@ -7,6 +7,7 @@ import api from '../services/api';
 
 function QuizDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,6 +17,7 @@ function QuizDetails() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [expired, setExpired] = useState(false);
   const [score, setScore] = useState(null);
+  const [submissionData, setSubmissionData] = useState(null);
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
   const [availabilityStatus, setAvailabilityStatus] = useState(null);
   const timerRef = useRef();
@@ -92,25 +94,26 @@ function QuizDetails() {
         answers: answersArray
       });
       
-      console.log('Submission response:', res);
-      console.log('Response data:', res.data);
-      
-      let responseScore = null;
-      if (res.data && res.data.score !== undefined) {
-        responseScore = res.data.score;
-      } else if (res.score !== undefined) {
-        responseScore = res.score;
-      }
-      
-      console.log('Extracted score:', responseScore);
-      
-      setScore(responseScore);
+      const responseData = res.data;
+      setSubmissionData(responseData);
+      setScore(responseData.score);
       setSubmitted(true);
     } catch (err) {
       console.error('Submission error:', err);
       setError('Failed to submit answers');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleViewResults = () => {
+    if (submissionData) {
+      localStorage.setItem(`quiz_results_${id}`, JSON.stringify({
+        score: submissionData.score,
+        answers: answers,
+        questions: quiz.questions
+      }));
+      navigate(`/quizzes/${id}/results`);
     }
   };
 
@@ -205,15 +208,19 @@ function QuizDetails() {
         </div>
       )}
       <div style={{ marginTop: 16 }}>
-        <a href={`/quizzes/${id}/results`} style={{ 
-          padding: '8px 16px', 
-          backgroundColor: '#007bff', 
-          color: 'white', 
-          textDecoration: 'none', 
-          borderRadius: '4px' 
-        }}>
+        <button 
+          onClick={handleViewResults}
+          style={{ 
+            padding: '8px 16px', 
+            backgroundColor: '#007bff', 
+            color: 'white', 
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
           View Results
-        </a>
+        </button>
       </div>
     </div>
   );
